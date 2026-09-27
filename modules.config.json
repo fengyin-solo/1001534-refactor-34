@@ -1,0 +1,390 @@
+{
+  "version": 1,
+  "description": "业务模块清单与统计口径的唯一配置来源：后端路由/示例数据、前端导航/路由/列表/概览全部从这里生成。新增模块只需在 modules 里加一项，不要再改第二处。",
+  "cards": [
+    { "key": "modules", "label": "业务模块" },
+    { "key": "created", "label": "今日新增" },
+    { "key": "pending", "label": "待处理" },
+    { "key": "abnormal", "label": "异常量" }
+  ],
+  "modules": [
+    {
+      "key": "station",
+      "label": "观测站点",
+      "entity": "观测站点",
+      "path": "/station",
+      "apiPrefix": "/api/station",
+      "codePrefix": "STAT",
+      "objectLabel": "观测站点",
+      "listFields": ["站点编码", "站点名称", "站点类别", "经纬度坐标", "海拔高度", "建站年份", "值守方式", "站点状态"],
+      "requiredFields": ["站点编码", "站点名称", "站点类别"],
+      "keywordField": "站点编码",
+      "statuses": ["待入网", "正常运行", "降级运行", "已停用"],
+      "pendingStatuses": ["待入网", "降级运行"],
+      "abnormalStatuses": ["降级运行"],
+      "actions": [
+        { "label": "办理入网", "target": "正常运行" },
+        { "label": "标记降级", "target": "降级运行" },
+        { "label": "停用站点", "target": "已停用" }
+      ],
+      "seedCount": 3
+    },
+    {
+      "key": "sensor",
+      "label": "观测传感器",
+      "entity": "观测传感器",
+      "path": "/sensor",
+      "apiPrefix": "/api/sensor",
+      "codePrefix": "SENS",
+      "objectLabel": "观测传感器",
+      "listFields": ["传感器编号", "所属站点", "观测要素", "设备型号", "出厂序列号", "安装高度", "检定有效期", "传感器状态"],
+      "requiredFields": ["传感器编号", "所属站点", "观测要素"],
+      "keywordField": "传感器编号",
+      "statuses": ["待检定", "正常采集", "疑误待查", "已拆除"],
+      "pendingStatuses": ["待检定", "疑误待查"],
+      "abnormalStatuses": ["疑误待查"],
+      "actions": [
+        { "label": "安排检定", "target": "待检定" },
+        { "label": "标记疑误", "target": "疑误待查" },
+        { "label": "拆除传感器", "target": "已拆除" }
+      ],
+      "seedCount": 3
+    },
+    {
+      "key": "observation",
+      "label": "观测记录",
+      "entity": "观测记录",
+      "path": "/observation",
+      "apiPrefix": "/api/observation",
+      "codePrefix": "OBSE",
+      "objectLabel": "观测记录",
+      "listFields": ["记录编号", "所属站点", "观测要素", "观测时刻", "观测数值", "数值单位", "质控标识", "记录状态"],
+      "requiredFields": ["记录编号", "所属站点", "观测要素"],
+      "keywordField": "记录编号",
+      "statuses": ["待质控", "质控通过", "疑误标记", "已作废"],
+      "pendingStatuses": ["待质控", "疑误标记"],
+      "abnormalStatuses": ["疑误标记"],
+      "actions": [
+        { "label": "提交质控", "target": "质控通过" },
+        { "label": "标记疑误", "target": "疑误标记" },
+        { "label": "作废记录", "target": "已作废" }
+      ],
+      "seedCount": 3
+    },
+    {
+      "key": "quality",
+      "label": "数据质控",
+      "entity": "质控任务",
+      "path": "/quality",
+      "apiPrefix": "/api/quality",
+      "codePrefix": "QUAL",
+      "objectLabel": "质控任务",
+      "listFields": ["质控编号", "质控时段", "涉及站点", "质控规则", "检出疑误数", "质控人员", "质控日期", "质控状态"],
+      "requiredFields": ["质控编号", "质控时段", "涉及站点"],
+      "keywordField": "质控编号",
+      "statuses": ["待执行", "执行中", "已完成", "已退回"],
+      "pendingStatuses": ["待执行", "执行中", "已退回"],
+      "abnormalStatuses": ["已退回"],
+      "actions": [
+        { "label": "启动质控", "target": "执行中" },
+        { "label": "确认完成", "target": "已完成" },
+        { "label": "退回重做", "target": "已退回" }
+      ],
+      "seedCount": 3
+    },
+    {
+      "key": "calibration",
+      "label": "设备标定",
+      "entity": "标定记录",
+      "path": "/calibration",
+      "apiPrefix": "/api/calibration",
+      "codePrefix": "CALI",
+      "objectLabel": "标定记录",
+      "listFields": ["标定编号", "标定对象", "标定机构", "标定项目", "标定结论", "有效期至", "标定人员", "标定状态"],
+      "requiredFields": ["标定编号", "标定对象", "标定机构"],
+      "keywordField": "标定编号",
+      "statuses": ["待送检", "标定中", "标定合格", "标定不合格"],
+      "pendingStatuses": ["待送检", "标定中", "标定不合格"],
+      "abnormalStatuses": ["标定不合格"],
+      "actions": [
+        { "label": "送检登记", "target": "标定中" },
+        { "label": "确认合格", "target": "标定合格" },
+        { "label": "判定不合格", "target": "标定不合格" }
+      ],
+      "seedCount": 3
+    },
+    {
+      "key": "transmission",
+      "label": "数据传输",
+      "entity": "传输链路",
+      "path": "/transmission",
+      "apiPrefix": "/api/transmission",
+      "codePrefix": "TRAN",
+      "objectLabel": "传输链路",
+      "listFields": ["链路编号", "所属站点", "传输方式", "上报频次", "最近上报时刻", "缺报次数", "链路带宽", "链路状态"],
+      "requiredFields": ["链路编号", "所属站点", "传输方式"],
+      "keywordField": "链路编号",
+      "statuses": ["待开通", "正常上报", "缺报告警", "已停用"],
+      "pendingStatuses": ["待开通", "缺报告警"],
+      "abnormalStatuses": ["缺报告警"],
+      "actions": [
+        { "label": "开通链路", "target": "正常上报" },
+        { "label": "确认恢复", "target": "缺报告警" },
+        { "label": "停用链路", "target": "已停用" }
+      ],
+      "seedCount": 3
+    },
+    {
+      "key": "power",
+      "label": "供电保障",
+      "entity": "供电单元",
+      "path": "/power",
+      "apiPrefix": "/api/power",
+      "codePrefix": "POWE",
+      "objectLabel": "供电单元",
+      "listFields": ["供电编号", "所属站点", "供电方式", "蓄电池容量", "上次放电测试", "备电时长", "责任人员", "供电状态"],
+      "requiredFields": ["供电编号", "所属站点", "供电方式"],
+      "keywordField": "供电编号",
+      "statuses": ["待巡检", "供电正常", "备电不足", "已断电"],
+      "pendingStatuses": ["待巡检", "备电不足", "已断电"],
+      "abnormalStatuses": ["备电不足", "已断电"],
+      "actions": [
+        { "label": "安排巡检", "target": "供电正常" },
+        { "label": "确认正常", "target": "备电不足" },
+        { "label": "标记断电", "target": "已断电" }
+      ],
+      "seedCount": 3
+    },
+    {
+      "key": "layout",
+      "label": "站网布局",
+      "entity": "站网规划",
+      "path": "/layout",
+      "apiPrefix": "/api/layout",
+      "codePrefix": "LAYO",
+      "objectLabel": "站网规划",
+      "listFields": ["规划编号", "规划区域", "目标站距", "拟建站数", "已建站数", "编制人员", "审批人员", "规划状态"],
+      "requiredFields": ["规划编号", "规划区域", "目标站距"],
+      "keywordField": "规划编号",
+      "statuses": ["待编制", "待审批", "已批复", "已作废"],
+      "pendingStatuses": ["待编制", "待审批"],
+      "abnormalStatuses": [],
+      "actions": [
+        { "label": "提交审批", "target": "待审批" },
+        { "label": "确认批复", "target": "已批复" },
+        { "label": "作废规划", "target": "已作废" }
+      ],
+      "seedCount": 3
+    },
+    {
+      "key": "inspection",
+      "label": "巡检任务",
+      "entity": "巡检单",
+      "path": "/inspection",
+      "apiPrefix": "/api/inspection",
+      "codePrefix": "INSP",
+      "objectLabel": "巡检单",
+      "listFields": ["巡检单号", "巡检站点", "巡检人员", "巡检日期", "巡检项目", "发现问题数", "巡检时长", "巡检状态"],
+      "requiredFields": ["巡检单号", "巡检站点", "巡检人员"],
+      "keywordField": "巡检单号",
+      "statuses": ["待派发", "巡检中", "已提交", "已作废"],
+      "pendingStatuses": ["待派发", "巡检中"],
+      "abnormalStatuses": [],
+      "actions": [
+        { "label": "派发巡检", "target": "巡检中" },
+        { "label": "提交结果", "target": "已提交" },
+        { "label": "作废巡检", "target": "已作废" }
+      ],
+      "seedCount": 3
+    },
+    {
+      "key": "fault",
+      "label": "故障处置",
+      "entity": "故障记录",
+      "path": "/fault",
+      "apiPrefix": "/api/fault",
+      "codePrefix": "FAUL",
+      "objectLabel": "故障记录",
+      "listFields": ["故障编号", "涉及站点", "故障现象", "发生时刻", "影响要素", "处置人员", "恢复时刻", "故障状态"],
+      "requiredFields": ["故障编号", "涉及站点", "故障现象"],
+      "keywordField": "故障编号",
+      "statuses": ["待派单", "处置中", "已恢复", "已挂起"],
+      "pendingStatuses": ["待派单", "处置中"],
+      "abnormalStatuses": ["处置中"],
+      "actions": [
+        { "label": "派单处置", "target": "处置中" },
+        { "label": "确认恢复", "target": "已恢复" },
+        { "label": "挂起故障", "target": "已挂起" }
+      ],
+      "seedCount": 3
+    },
+    {
+      "key": "sparepart",
+      "label": "备件器材",
+      "entity": "备件器材",
+      "path": "/sparepart",
+      "apiPrefix": "/api/sparepart",
+      "codePrefix": "SPAR",
+      "objectLabel": "备件器材",
+      "listFields": ["备件编号", "备件名称", "适用型号", "结存数量", "计量单位", "存放库位", "保管人员", "备件状态"],
+      "requiredFields": ["备件编号", "备件名称", "适用型号"],
+      "keywordField": "备件编号",
+      "statuses": ["正常可用", "储备不足", "已冻结", "已耗尽"],
+      "pendingStatuses": ["储备不足", "已耗尽"],
+      "abnormalStatuses": ["储备不足", "已耗尽"],
+      "actions": [
+        { "label": "冻结备件", "target": "已冻结" },
+        { "label": "解冻备件", "target": "正常可用" },
+        { "label": "登记耗尽", "target": "已耗尽" }
+      ],
+      "seedCount": 3
+    },
+    {
+      "key": "metainfo",
+      "label": "元数据登记",
+      "entity": "元数据记录",
+      "path": "/metainfo",
+      "apiPrefix": "/api/metainfo",
+      "codePrefix": "META",
+      "objectLabel": "元数据记录",
+      "listFields": ["元数据编号", "关联站点", "元数据类型", "版本号", "变更内容", "登记人员", "生效日期", "元数据状态"],
+      "requiredFields": ["元数据编号", "关联站点", "元数据类型"],
+      "keywordField": "元数据编号",
+      "statuses": ["待登记", "已生效", "待补充", "已作废"],
+      "pendingStatuses": ["待登记", "待补充"],
+      "abnormalStatuses": ["待补充"],
+      "actions": [
+        { "label": "提交登记", "target": "已生效" },
+        { "label": "确认生效", "target": "待补充" },
+        { "label": "作废记录", "target": "已作废" }
+      ],
+      "seedCount": 3
+    },
+    {
+      "key": "alarm",
+      "label": "告警监测",
+      "entity": "告警记录",
+      "path": "/alarm",
+      "apiPrefix": "/api/alarm",
+      "codePrefix": "ALAR",
+      "objectLabel": "告警记录",
+      "listFields": ["告警编号", "告警来源", "告警类型", "触发阈值", "触发时刻", "处置人员", "关闭时刻", "告警状态"],
+      "requiredFields": ["告警编号", "告警来源", "告警类型"],
+      "keywordField": "告警编号",
+      "statuses": ["待确认", "处置中", "已关闭", "已忽略"],
+      "pendingStatuses": ["待确认", "处置中"],
+      "abnormalStatuses": ["待确认", "处置中"],
+      "actions": [
+        { "label": "确认告警", "target": "处置中" },
+        { "label": "关闭告警", "target": "已关闭" },
+        { "label": "忽略告警", "target": "已忽略" }
+      ],
+      "seedCount": 3
+    },
+    {
+      "key": "comm",
+      "label": "通信设备",
+      "entity": "通信设备",
+      "path": "/comm",
+      "apiPrefix": "/api/comm",
+      "codePrefix": "COMM",
+      "objectLabel": "通信设备",
+      "listFields": ["设备编号", "设备名称", "设备型号", "所属站点", "安装日期", "上次检修日", "责任人", "设备状态"],
+      "requiredFields": ["设备编号", "设备名称", "设备型号"],
+      "keywordField": "设备编号",
+      "statuses": ["待检修", "运行正常", "检修中", "已报废"],
+      "pendingStatuses": ["待检修", "检修中"],
+      "abnormalStatuses": ["待检修"],
+      "actions": [
+        { "label": "安排检修", "target": "检修中" },
+        { "label": "确认正常", "target": "运行正常" },
+        { "label": "报废设备", "target": "已报废" }
+      ],
+      "seedCount": 3
+    },
+    {
+      "key": "service",
+      "label": "服务保障",
+      "entity": "服务事项",
+      "path": "/service",
+      "apiPrefix": "/api/service",
+      "codePrefix": "SERV",
+      "objectLabel": "服务事项",
+      "listFields": ["事项编号", "服务对象", "服务类别", "响应时限", "受理人员", "完成时刻", "评价结果", "事项状态"],
+      "requiredFields": ["事项编号", "服务对象", "服务类别"],
+      "keywordField": "事项编号",
+      "statuses": ["待受理", "办理中", "已办结", "已退回"],
+      "pendingStatuses": ["待受理", "办理中", "已退回"],
+      "abnormalStatuses": ["已退回"],
+      "actions": [
+        { "label": "受理事项", "target": "办理中" },
+        { "label": "确认办结", "target": "已办结" },
+        { "label": "退回事项", "target": "已退回" }
+      ],
+      "seedCount": 3
+    },
+    {
+      "key": "contract",
+      "label": "运维合同",
+      "entity": "运维合同",
+      "path": "/contract",
+      "apiPrefix": "/api/contract",
+      "codePrefix": "CONT",
+      "objectLabel": "运维合同",
+      "listFields": ["合同编号", "服务单位", "合同金额", "服务期限", "考核方式", "签订人员", "到期日期", "合同状态"],
+      "requiredFields": ["合同编号", "服务单位", "合同金额"],
+      "keywordField": "合同编号",
+      "statuses": ["待签订", "履行中", "已到期", "已终止"],
+      "pendingStatuses": ["待签订", "已到期"],
+      "abnormalStatuses": ["已到期"],
+      "actions": [
+        { "label": "确认签订", "target": "履行中" },
+        { "label": "标记到期", "target": "已到期" },
+        { "label": "终止合同", "target": "已终止" }
+      ],
+      "seedCount": 3
+    },
+    {
+      "key": "settlement",
+      "label": "经费结算",
+      "entity": "结算单",
+      "path": "/settlement",
+      "apiPrefix": "/api/settlement",
+      "codePrefix": "SETT",
+      "objectLabel": "结算单",
+      "listFields": ["结算单号", "关联合同", "结算周期", "应付金额", "已付金额", "审核人员", "付款日期", "结算状态"],
+      "requiredFields": ["结算单号", "关联合同", "结算周期"],
+      "keywordField": "结算单号",
+      "statuses": ["待核算", "待审核", "已付款", "已驳回"],
+      "pendingStatuses": ["待核算", "待审核", "已驳回"],
+      "abnormalStatuses": ["已驳回"],
+      "actions": [
+        { "label": "提交审核", "target": "待审核" },
+        { "label": "确认付款", "target": "已付款" },
+        { "label": "驳回结算", "target": "已驳回" }
+      ],
+      "seedCount": 3
+    },
+    {
+      "key": "training",
+      "label": "人员培训",
+      "entity": "培训记录",
+      "path": "/training",
+      "apiPrefix": "/api/training",
+      "codePrefix": "TRAI",
+      "objectLabel": "培训记录",
+      "listFields": ["培训编号", "培训主题", "培训对象", "授课人员", "培训课时", "考核成绩", "培训日期", "培训状态"],
+      "requiredFields": ["培训编号", "培训主题", "培训对象"],
+      "keywordField": "培训编号",
+      "statuses": ["待开班", "进行中", "已结班", "已取消"],
+      "pendingStatuses": ["待开班", "进行中"],
+      "abnormalStatuses": [],
+      "actions": [
+        { "label": "开班登记", "target": "进行中" },
+        { "label": "确认结班", "target": "已结班" },
+        { "label": "取消培训", "target": "已取消" }
+      ],
+      "seedCount": 3
+    }
+  ]
+}

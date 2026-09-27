@@ -20,8 +20,13 @@
 
 <script setup lang="ts">
 import { useSessionStore } from '@/stores/session'
+import { modules } from '@/modules'
 
 const store = useSessionStore()
 
-const navItems = [{ label: "运营概览", path: "/" }, { label: "观测站点", path: "/station" }, { label: "观测传感器", path: "/sensor" }, { label: "观测记录", path: "/observation" }, { label: "数据质控", path: "/quality" }, { label: "设备标定", path: "/calibration" }, { label: "数据传输", path: "/transmission" }, { label: "供电保障", path: "/power" }, { label: "站网布局", path: "/layout" }, { label: "巡检任务", path: "/inspection" }, { label: "故障处置", path: "/fault" }, { label: "备件器材", path: "/sparepart" }, { label: "元数据登记", path: "/metainfo" }, { label: "告警监测", path: "/alarm" }, { label: "通信设备", path: "/comm" }, { label: "服务保障", path: "/service" }, { label: "运维合同", path: "/contract" }, { label: "经费结算", path: "/settlement" }, { label: "人员培训", path: "/training" }]
+// 侧边导航由模块配置生成，与运营概览、路由表同一份清单。
+const navItems = [
+  { label: '运营概览', path: '/' },
+  ...modules.map((module) => ({ label: module.label, path: module.path })),
+]
 </script>

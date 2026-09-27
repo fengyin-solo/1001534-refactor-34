@@ -4,7 +4,10 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
+    "check:modules": "node scripts/check-modules.cjs",
+    "predev": "node scripts/check-modules.cjs",
     "dev": "vite",
+    "prebuild": "node scripts/check-modules.cjs",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
     "typecheck": "vue-tsc --noEmit"
@@ -12,7 +15,7 @@
   "dependencies": {
     "pinia": "^2.1.7",
     "vue": "^3.4.21",
-    "vue-router": "^4.3.0"
+    "vue-router": "^4.4.0"
   },
   "devDependencies": {
     "@types/node": "^20.11.30",

@@ -9,8 +9,19 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
+from app.modules_config import get_registry
 from app.routers import ROUTERS
 from app.store import store
+from app.validate_modules import validate
+
+# 启动即校验模块对齐：配置、示例数据、路由、前端声明对不上时直接起不来，
+# 避免本地能跑、构建或部署后模块清单错位。
+_alignment_errors = validate()
+if _alignment_errors:
+    raise RuntimeError(
+        "模块对齐校验未通过，请先修正 modules.config.json 并运行 scripts/sync_modules.py：\n  - "
+        + "\n  - ".join(_alignment_errors)
+    )
 
 app = FastAPI(title="气象观测站网运维平台", version="1.0.0")
 
@@ -22,14 +33,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-for module in ROUTERS:
-    app.include_router(module.router)
+for module_router in ROUTERS:
+    app.include_router(module_router)
 
 
 @app.get("/api/health")
 def health() -> dict[str, object]:
     """健康检查：确认服务已经监听、示例数据已经就绪。"""
-    return {"ok": True, "app": settings.app_name, "modules": len(store.module_names())}
+    return {"ok": True, "app": settings.app_name, "modules": len(get_registry().modules)}
 
 
 @app.get("/api/overview")
