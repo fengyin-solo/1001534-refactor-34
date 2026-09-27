@@ -9,7 +9,6 @@ MODULE = "comm"
 REQUIRED_FIELDS = ["设备编号", "设备名称", "设备型号"]
 STATUS_ORDER = ["待检修", "运行正常", "检修中", "已报废"]
 ACTION_RULES = {"安排检修": "检修中", "确认正常": "运行正常", "报废设备": "已报废"}
-NEGATIVE_ACTIONS = []
 
 
 class CommService:
@@ -41,8 +40,6 @@ class CommService:
         entry = {"id": max((int(row.get("id", 0)) for row in rows), default=0) + 1}
         entry.update({field: values.get(field) for field in REQUIRED_FIELDS})
         entry["status"] = STATUS_ORDER[0]
-        entry["pending"] = True
-        entry["abnormal"] = False
         rows.append(entry)
         return entry, []
 
@@ -56,6 +53,4 @@ class CommService:
         if target not in STATUS_ORDER:
             return None, f"目标状态「{target}」不在允许的状态序列里"
         entry["status"] = target
-        entry["pending"] = target != STATUS_ORDER[-1]
-        entry["abnormal"] = action in NEGATIVE_ACTIONS
         return entry, f"通信设备已{action}"

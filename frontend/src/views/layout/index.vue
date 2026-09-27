@@ -63,9 +63,10 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 
 import { request } from '@/api/client'
+import { countByCriteria } from '@/modules'
 
 type Row = Record<string, string | number | null>
 
@@ -73,7 +74,16 @@ const ENDPOINT = '/api/layout'
 const columns = ["规划编号", "规划区域", "目标站距", "拟建站数", "已建站数", "编制人员", "审批人员", "规划状态"]
 const actions = ["提交审批", "确认批复", "作废规划"]
 const statuses = ["待编制", "待审批", "已批复", "已作废"]
-const stats = [{"label": "待审批规划", "value": 0}, {"label": "已批复规划", "value": 0}, {"label": "站网密度", "value": 0}]
+const MODULE_KEY = 'layout'
+// 统计卡片与运营概览同一份口径（modules.config.json），不再各自判断
+const stats = computed(() => {
+  const counts = countByCriteria(MODULE_KEY, rows.value)
+  return [
+    { label: '记录总量', value: counts.total },
+    { label: '待处理', value: counts.pending },
+    { label: '异常量', value: counts.abnormal },
+  ]
+})
 
 const rows = ref<Row[]>([])
 const total = ref(0)

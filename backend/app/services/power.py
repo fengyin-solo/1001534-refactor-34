@@ -9,7 +9,6 @@ MODULE = "power"
 REQUIRED_FIELDS = ["供电编号", "所属站点", "供电方式"]
 STATUS_ORDER = ["待巡检", "供电正常", "备电不足", "已断电"]
 ACTION_RULES = {"安排巡检": "供电正常", "确认正常": "备电不足", "标记断电": "已断电"}
-NEGATIVE_ACTIONS = []
 
 
 class PowerService:
@@ -41,8 +40,6 @@ class PowerService:
         entry = {"id": max((int(row.get("id", 0)) for row in rows), default=0) + 1}
         entry.update({field: values.get(field) for field in REQUIRED_FIELDS})
         entry["status"] = STATUS_ORDER[0]
-        entry["pending"] = True
-        entry["abnormal"] = False
         rows.append(entry)
         return entry, []
 
@@ -56,6 +53,4 @@ class PowerService:
         if target not in STATUS_ORDER:
             return None, f"目标状态「{target}」不在允许的状态序列里"
         entry["status"] = target
-        entry["pending"] = target != STATUS_ORDER[-1]
-        entry["abnormal"] = action in NEGATIVE_ACTIONS
         return entry, f"供电单元已{action}"

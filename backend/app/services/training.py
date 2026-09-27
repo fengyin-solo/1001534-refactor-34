@@ -9,7 +9,6 @@ MODULE = "training"
 REQUIRED_FIELDS = ["培训编号", "培训主题", "培训对象"]
 STATUS_ORDER = ["待开班", "进行中", "已结班", "已取消"]
 ACTION_RULES = {"开班登记": "进行中", "确认结班": "已结班", "取消培训": "已取消"}
-NEGATIVE_ACTIONS = []
 
 
 class TrainingService:
@@ -41,8 +40,6 @@ class TrainingService:
         entry = {"id": max((int(row.get("id", 0)) for row in rows), default=0) + 1}
         entry.update({field: values.get(field) for field in REQUIRED_FIELDS})
         entry["status"] = STATUS_ORDER[0]
-        entry["pending"] = True
-        entry["abnormal"] = False
         rows.append(entry)
         return entry, []
 
@@ -56,6 +53,4 @@ class TrainingService:
         if target not in STATUS_ORDER:
             return None, f"目标状态「{target}」不在允许的状态序列里"
         entry["status"] = target
-        entry["pending"] = target != STATUS_ORDER[-1]
-        entry["abnormal"] = action in NEGATIVE_ACTIONS
         return entry, f"培训记录已{action}"

@@ -63,9 +63,10 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 
 import { request } from '@/api/client'
+import { countByCriteria } from '@/modules'
 
 type Row = Record<string, string | number | null>
 
@@ -73,7 +74,16 @@ const ENDPOINT = '/api/training'
 const columns = ["培训编号", "培训主题", "培训对象", "授课人员", "培训课时", "考核成绩", "培训日期", "培训状态"]
 const actions = ["开班登记", "确认结班", "取消培训"]
 const statuses = ["待开班", "进行中", "已结班", "已取消"]
-const stats = [{"label": "待开班培训", "value": 0}, {"label": "本月结班数", "value": 0}, {"label": "考核未通过", "value": 0}]
+const MODULE_KEY = 'training'
+// 统计卡片与运营概览同一份口径（modules.config.json），不再各自判断
+const stats = computed(() => {
+  const counts = countByCriteria(MODULE_KEY, rows.value)
+  return [
+    { label: '记录总量', value: counts.total },
+    { label: '待处理', value: counts.pending },
+    { label: '异常量', value: counts.abnormal },
+  ]
+})
 
 const rows = ref<Row[]>([])
 const total = ref(0)

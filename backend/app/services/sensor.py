@@ -9,7 +9,6 @@ MODULE = "sensor"
 REQUIRED_FIELDS = ["传感器编号", "所属站点", "观测要素"]
 STATUS_ORDER = ["待检定", "正常采集", "疑误待查", "已拆除"]
 ACTION_RULES = {"安排检定": "待检定", "标记疑误": "疑误待查", "拆除传感器": "已拆除"}
-NEGATIVE_ACTIONS = []
 
 
 class SensorService:
@@ -41,8 +40,6 @@ class SensorService:
         entry = {"id": max((int(row.get("id", 0)) for row in rows), default=0) + 1}
         entry.update({field: values.get(field) for field in REQUIRED_FIELDS})
         entry["status"] = STATUS_ORDER[0]
-        entry["pending"] = True
-        entry["abnormal"] = False
         rows.append(entry)
         return entry, []
 
@@ -56,6 +53,4 @@ class SensorService:
         if target not in STATUS_ORDER:
             return None, f"目标状态「{target}」不在允许的状态序列里"
         entry["status"] = target
-        entry["pending"] = target != STATUS_ORDER[-1]
-        entry["abnormal"] = action in NEGATIVE_ACTIONS
         return entry, f"观测传感器已{action}"

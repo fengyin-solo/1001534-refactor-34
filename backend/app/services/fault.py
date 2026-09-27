@@ -9,7 +9,6 @@ MODULE = "fault"
 REQUIRED_FIELDS = ["故障编号", "涉及站点", "故障现象"]
 STATUS_ORDER = ["待派单", "处置中", "已恢复", "已挂起"]
 ACTION_RULES = {"派单处置": "处置中", "确认恢复": "已恢复", "挂起故障": "已挂起"}
-NEGATIVE_ACTIONS = []
 
 
 class FaultService:
@@ -41,8 +40,6 @@ class FaultService:
         entry = {"id": max((int(row.get("id", 0)) for row in rows), default=0) + 1}
         entry.update({field: values.get(field) for field in REQUIRED_FIELDS})
         entry["status"] = STATUS_ORDER[0]
-        entry["pending"] = True
-        entry["abnormal"] = False
         rows.append(entry)
         return entry, []
 
@@ -56,6 +53,4 @@ class FaultService:
         if target not in STATUS_ORDER:
             return None, f"目标状态「{target}」不在允许的状态序列里"
         entry["status"] = target
-        entry["pending"] = target != STATUS_ORDER[-1]
-        entry["abnormal"] = action in NEGATIVE_ACTIONS
         return entry, f"故障记录已{action}"

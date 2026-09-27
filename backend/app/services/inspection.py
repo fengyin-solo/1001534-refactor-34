@@ -9,7 +9,6 @@ MODULE = "inspection"
 REQUIRED_FIELDS = ["巡检单号", "巡检站点", "巡检人员"]
 STATUS_ORDER = ["待派发", "巡检中", "已提交", "已作废"]
 ACTION_RULES = {"派发巡检": "巡检中", "提交结果": "已提交", "作废巡检": "已作废"}
-NEGATIVE_ACTIONS = ["作废巡检"]
 
 
 class InspectionService:
@@ -41,8 +40,6 @@ class InspectionService:
         entry = {"id": max((int(row.get("id", 0)) for row in rows), default=0) + 1}
         entry.update({field: values.get(field) for field in REQUIRED_FIELDS})
         entry["status"] = STATUS_ORDER[0]
-        entry["pending"] = True
-        entry["abnormal"] = False
         rows.append(entry)
         return entry, []
 
@@ -56,6 +53,4 @@ class InspectionService:
         if target not in STATUS_ORDER:
             return None, f"目标状态「{target}」不在允许的状态序列里"
         entry["status"] = target
-        entry["pending"] = target != STATUS_ORDER[-1]
-        entry["abnormal"] = action in NEGATIVE_ACTIONS
         return entry, f"巡检单已{action}"

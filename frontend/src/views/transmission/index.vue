@@ -63,9 +63,10 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 
 import { request } from '@/api/client'
+import { countByCriteria } from '@/modules'
 
 type Row = Record<string, string | number | null>
 
@@ -73,7 +74,16 @@ const ENDPOINT = '/api/transmission'
 const columns = ["链路编号", "所属站点", "传输方式", "上报频次", "最近上报时刻", "缺报次数", "链路带宽", "链路状态"]
 const actions = ["开通链路", "确认恢复", "停用链路"]
 const statuses = ["待开通", "正常上报", "缺报告警", "已停用"]
-const stats = [{"label": "在用链路", "value": 0}, {"label": "缺报链路", "value": 0}, {"label": "今日缺报次数", "value": 0}]
+const MODULE_KEY = 'transmission'
+// 统计卡片与运营概览同一份口径（modules.config.json），不再各自判断
+const stats = computed(() => {
+  const counts = countByCriteria(MODULE_KEY, rows.value)
+  return [
+    { label: '记录总量', value: counts.total },
+    { label: '待处理', value: counts.pending },
+    { label: '异常量', value: counts.abnormal },
+  ]
+})
 
 const rows = ref<Row[]>([])
 const total = ref(0)

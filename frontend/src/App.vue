@@ -19,9 +19,14 @@
 </template>
 
 <script setup lang="ts">
+import { MODULES } from '@/modules'
 import { useSessionStore } from '@/stores/session'
 
 const store = useSessionStore()
 
-const navItems = [{ label: "运营概览", path: "/" }, { label: "观测站点", path: "/station" }, { label: "观测传感器", path: "/sensor" }, { label: "观测记录", path: "/observation" }, { label: "数据质控", path: "/quality" }, { label: "设备标定", path: "/calibration" }, { label: "数据传输", path: "/transmission" }, { label: "供电保障", path: "/power" }, { label: "站网布局", path: "/layout" }, { label: "巡检任务", path: "/inspection" }, { label: "故障处置", path: "/fault" }, { label: "备件器材", path: "/sparepart" }, { label: "元数据登记", path: "/metainfo" }, { label: "告警监测", path: "/alarm" }, { label: "通信设备", path: "/comm" }, { label: "服务保障", path: "/service" }, { label: "运维合同", path: "/contract" }, { label: "经费结算", path: "/settlement" }, { label: "人员培训", path: "/training" }]
+// 导航与运营概览、路由共用同一份模块清单，新增模块不需要再改这里
+const navItems = [
+  { label: '运营概览', path: '/' },
+  ...MODULES.map((module) => ({ label: module.label, path: `/${module.key}` })),
+]
 </script>

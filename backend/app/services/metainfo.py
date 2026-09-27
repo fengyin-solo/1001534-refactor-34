@@ -9,7 +9,6 @@ MODULE = "metainfo"
 REQUIRED_FIELDS = ["元数据编号", "关联站点", "元数据类型"]
 STATUS_ORDER = ["待登记", "已生效", "待补充", "已作废"]
 ACTION_RULES = {"提交登记": "已生效", "确认生效": "待补充", "作废记录": "已作废"}
-NEGATIVE_ACTIONS = ["作废记录"]
 
 
 class MetainfoService:
@@ -41,8 +40,6 @@ class MetainfoService:
         entry = {"id": max((int(row.get("id", 0)) for row in rows), default=0) + 1}
         entry.update({field: values.get(field) for field in REQUIRED_FIELDS})
         entry["status"] = STATUS_ORDER[0]
-        entry["pending"] = True
-        entry["abnormal"] = False
         rows.append(entry)
         return entry, []
 
@@ -56,6 +53,4 @@ class MetainfoService:
         if target not in STATUS_ORDER:
             return None, f"目标状态「{target}」不在允许的状态序列里"
         entry["status"] = target
-        entry["pending"] = target != STATUS_ORDER[-1]
-        entry["abnormal"] = action in NEGATIVE_ACTIONS
         return entry, f"元数据记录已{action}"

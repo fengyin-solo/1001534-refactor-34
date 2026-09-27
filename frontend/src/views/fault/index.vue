@@ -63,9 +63,10 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 
 import { request } from '@/api/client'
+import { countByCriteria } from '@/modules'
 
 type Row = Record<string, string | number | null>
 
@@ -73,7 +74,16 @@ const ENDPOINT = '/api/fault'
 const columns = ["故障编号", "涉及站点", "故障现象", "发生时刻", "影响要素", "处置人员", "恢复时刻", "故障状态"]
 const actions = ["派单处置", "确认恢复", "挂起故障"]
 const statuses = ["待派单", "处置中", "已恢复", "已挂起"]
-const stats = [{"label": "待派单故障", "value": 0}, {"label": "处置中故障", "value": 0}, {"label": "平均恢复时长", "value": 0}]
+const MODULE_KEY = 'fault'
+// 统计卡片与运营概览同一份口径（modules.config.json），不再各自判断
+const stats = computed(() => {
+  const counts = countByCriteria(MODULE_KEY, rows.value)
+  return [
+    { label: '记录总量', value: counts.total },
+    { label: '待处理', value: counts.pending },
+    { label: '异常量', value: counts.abnormal },
+  ]
+})
 
 const rows = ref<Row[]>([])
 const total = ref(0)

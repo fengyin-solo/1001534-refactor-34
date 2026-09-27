@@ -9,7 +9,6 @@ MODULE = "transmission"
 REQUIRED_FIELDS = ["链路编号", "所属站点", "传输方式"]
 STATUS_ORDER = ["待开通", "正常上报", "缺报告警", "已停用"]
 ACTION_RULES = {"开通链路": "正常上报", "确认恢复": "缺报告警", "停用链路": "已停用"}
-NEGATIVE_ACTIONS = ["停用链路"]
 
 
 class TransmissionService:
@@ -41,8 +40,6 @@ class TransmissionService:
         entry = {"id": max((int(row.get("id", 0)) for row in rows), default=0) + 1}
         entry.update({field: values.get(field) for field in REQUIRED_FIELDS})
         entry["status"] = STATUS_ORDER[0]
-        entry["pending"] = True
-        entry["abnormal"] = False
         rows.append(entry)
         return entry, []
 
@@ -56,6 +53,4 @@ class TransmissionService:
         if target not in STATUS_ORDER:
             return None, f"目标状态「{target}」不在允许的状态序列里"
         entry["status"] = target
-        entry["pending"] = target != STATUS_ORDER[-1]
-        entry["abnormal"] = action in NEGATIVE_ACTIONS
         return entry, f"传输链路已{action}"

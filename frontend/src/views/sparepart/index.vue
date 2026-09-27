@@ -63,9 +63,10 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 
 import { request } from '@/api/client'
+import { countByCriteria } from '@/modules'
 
 type Row = Record<string, string | number | null>
 
@@ -73,7 +74,16 @@ const ENDPOINT = '/api/sparepart'
 const columns = ["备件编号", "备件名称", "适用型号", "结存数量", "计量单位", "存放库位", "保管人员", "备件状态"]
 const actions = ["冻结备件", "解冻备件", "登记耗尽"]
 const statuses = ["正常可用", "储备不足", "已冻结", "已耗尽"]
-const stats = [{"label": "可用备件", "value": 0}, {"label": "储备不足备件", "value": 0}, {"label": "已冻结备件", "value": 0}]
+const MODULE_KEY = 'sparepart'
+// 统计卡片与运营概览同一份口径（modules.config.json），不再各自判断
+const stats = computed(() => {
+  const counts = countByCriteria(MODULE_KEY, rows.value)
+  return [
+    { label: '记录总量', value: counts.total },
+    { label: '待处理', value: counts.pending },
+    { label: '异常量', value: counts.abnormal },
+  ]
+})
 
 const rows = ref<Row[]>([])
 const total = ref(0)

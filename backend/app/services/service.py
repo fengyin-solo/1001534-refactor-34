@@ -9,7 +9,6 @@ MODULE = "service"
 REQUIRED_FIELDS = ["事项编号", "服务对象", "服务类别"]
 STATUS_ORDER = ["待受理", "办理中", "已办结", "已退回"]
 ACTION_RULES = {"受理事项": "办理中", "确认办结": "已办结", "退回事项": "已退回"}
-NEGATIVE_ACTIONS = []
 
 
 class ServiceService:
@@ -41,8 +40,6 @@ class ServiceService:
         entry = {"id": max((int(row.get("id", 0)) for row in rows), default=0) + 1}
         entry.update({field: values.get(field) for field in REQUIRED_FIELDS})
         entry["status"] = STATUS_ORDER[0]
-        entry["pending"] = True
-        entry["abnormal"] = False
         rows.append(entry)
         return entry, []
 
@@ -56,6 +53,4 @@ class ServiceService:
         if target not in STATUS_ORDER:
             return None, f"目标状态「{target}」不在允许的状态序列里"
         entry["status"] = target
-        entry["pending"] = target != STATUS_ORDER[-1]
-        entry["abnormal"] = action in NEGATIVE_ACTIONS
         return entry, f"服务事项已{action}"

@@ -63,9 +63,10 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 
 import { request } from '@/api/client'
+import { countByCriteria } from '@/modules'
 
 type Row = Record<string, string | number | null>
 
@@ -73,7 +74,16 @@ const ENDPOINT = '/api/calibration'
 const columns = ["标定编号", "标定对象", "标定机构", "标定项目", "标定结论", "有效期至", "标定人员", "标定状态"]
 const actions = ["送检登记", "确认合格", "判定不合格"]
 const statuses = ["待送检", "标定中", "标定合格", "标定不合格"]
-const stats = [{"label": "待送检设备", "value": 0}, {"label": "本月合格数", "value": 0}, {"label": "超期未标定", "value": 0}]
+const MODULE_KEY = 'calibration'
+// 统计卡片与运营概览同一份口径（modules.config.json），不再各自判断
+const stats = computed(() => {
+  const counts = countByCriteria(MODULE_KEY, rows.value)
+  return [
+    { label: '记录总量', value: counts.total },
+    { label: '待处理', value: counts.pending },
+    { label: '异常量', value: counts.abnormal },
+  ]
+})
 
 const rows = ref<Row[]>([])
 const total = ref(0)

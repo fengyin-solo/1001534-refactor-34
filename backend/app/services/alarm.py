@@ -9,7 +9,6 @@ MODULE = "alarm"
 REQUIRED_FIELDS = ["告警编号", "告警来源", "告警类型"]
 STATUS_ORDER = ["待确认", "处置中", "已关闭", "已忽略"]
 ACTION_RULES = {"确认告警": "处置中", "关闭告警": "已关闭", "忽略告警": "已忽略"}
-NEGATIVE_ACTIONS = ["忽略告警"]
 
 
 class AlarmService:
@@ -41,8 +40,6 @@ class AlarmService:
         entry = {"id": max((int(row.get("id", 0)) for row in rows), default=0) + 1}
         entry.update({field: values.get(field) for field in REQUIRED_FIELDS})
         entry["status"] = STATUS_ORDER[0]
-        entry["pending"] = True
-        entry["abnormal"] = False
         rows.append(entry)
         return entry, []
 
@@ -56,6 +53,4 @@ class AlarmService:
         if target not in STATUS_ORDER:
             return None, f"目标状态「{target}」不在允许的状态序列里"
         entry["status"] = target
-        entry["pending"] = target != STATUS_ORDER[-1]
-        entry["abnormal"] = action in NEGATIVE_ACTIONS
         return entry, f"告警记录已{action}"

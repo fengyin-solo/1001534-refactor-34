@@ -9,18 +9,51 @@
 
 ```text
 .
+├── modules.config.json     业务模块清单与待处理/异常统计口径的唯一来源
+├── scripts/
+│   └── check_modules.py    按配置校验前后端模块是否对齐（make check）
 ├── frontend/                 Vue 3 + Vite + TypeScript 前端
 │   ├── src/views/            每个业务模块一个页面
+│   ├── src/modules.ts        读取 modules.config.json 的前端入口
 │   ├── src/api/              统一请求封装
 │   ├── src/stores/           会话与筛选状态
 │   └── vite.config.ts        dev server 配置（open: false）
 ├── backend/                  FastAPI（Python） 后端
+│   ├── app/modules.py        读取 modules.config.json 的后端入口与启动校验
 │   ├── app/routers/          每个业务模块一组接口
 │   ├── app/services/         业务规则与状态流转
 │   └── app/store.py          内存数据仓库与示例数据
 ├── .gitignore
 └── docker-compose.yml
 ```
+
+## 模块清单与统计口径
+
+`modules.config.json` 是唯一一份模块配置，前后端都从这里取数：
+
+- 每个模块登记 `key`（目录名/接口前缀）、`label`（中文名）、`entity`（业务对象）。
+- `pendingStatuses` / `abnormalStatuses` 是待处理与异常的统一口径：
+  运营概览的汇总、各模块列表页的统计卡片都按记录的业务状态落不落在
+  这两个集合里来换算，不再各自判断，两处必然一致。
+- 前端的侧边导航、路由、运营概览的模块行都由它生成；接口不可用时概览页
+  会列出全部模块并给出可读的原因说明，不会回退到写死的假数据。
+
+校验贯穿整个流程，不一致就直接失败并打印问题清单：
+
+- 本地启动：`make backend` / `make frontend` 前会先跑 `make check`
+  （即 `python3 scripts/check_modules.py`），前端 `npm run dev` / `npm run build`
+  也会先跑 `frontend/scripts/check-modules.mjs`。
+- 后端启动：`app/main.py` 导入时执行同样的对齐校验，失败则拒绝启动。
+- 构建部署：前后端 Dockerfile 在构建期分别跑校验脚本，镜像构建即卡口。
+
+新增模块的步骤（校验脚本会逐项提醒缺什么）：
+
+1. 在 `modules.config.json` 里登记模块 key、中文名与待处理/异常口径。
+2. 补后端 `app/routers/<key>.py`、`app/services/<key>.py`，并在
+   `app/routers/__init__.py` 的 `ROUTERS` 里注册。
+3. 补前端 `frontend/src/views/<key>/index.vue`。
+4. 在 `app/seed.py` 里为该模块准备示例数据。
+5. 跑 `make check` 确认前后端对齐。
 
 ## 启动
 
@@ -70,7 +103,10 @@ npm run dev
 
 ## 约定
 
+- 模块清单与待处理/异常口径以根目录 `modules.config.json` 为准，见上节。
 - 每个模块的前端页面在 `frontend/src/views/<模块>/index.vue`，后端接口在
   `backend/app/routers/<模块>.py`，业务规则在 `backend/app/services/<模块>.py`。
 - 列表接口统一返回 `{ items, total, page, size }`，动作接口统一返回 `{ ok, message }`。
 - 状态流转只允许在 `app/services` 里改，路由层不做业务判断。
+- 待处理/异常不在数据行里存标记位，统一按 `modules.config.json` 的口径
+  从业务状态实时换算，概览与列表页因此始终一致。

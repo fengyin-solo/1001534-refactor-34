@@ -9,7 +9,6 @@ MODULE = "contract"
 REQUIRED_FIELDS = ["合同编号", "服务单位", "合同金额"]
 STATUS_ORDER = ["待签订", "履行中", "已到期", "已终止"]
 ACTION_RULES = {"确认签订": "履行中", "标记到期": "已到期", "终止合同": "已终止"}
-NEGATIVE_ACTIONS = []
 
 
 class ContractService:
@@ -41,8 +40,6 @@ class ContractService:
         entry = {"id": max((int(row.get("id", 0)) for row in rows), default=0) + 1}
         entry.update({field: values.get(field) for field in REQUIRED_FIELDS})
         entry["status"] = STATUS_ORDER[0]
-        entry["pending"] = True
-        entry["abnormal"] = False
         rows.append(entry)
         return entry, []
 
@@ -56,6 +53,4 @@ class ContractService:
         if target not in STATUS_ORDER:
             return None, f"目标状态「{target}」不在允许的状态序列里"
         entry["status"] = target
-        entry["pending"] = target != STATUS_ORDER[-1]
-        entry["abnormal"] = action in NEGATIVE_ACTIONS
         return entry, f"运维合同已{action}"

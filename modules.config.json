@@ -1,0 +1,131 @@
+{
+  "comment": "业务模块清单与统计口径的唯一来源。前端导航/路由/概览、后端路由/服务/示例数据、启动与构建校验都以此文件为准；新增模块时先在这里登记，再按 scripts/check_modules.py 的报错清单补齐前后端文件。",
+  "modules": [
+    {
+      "key": "station",
+      "label": "观测站点",
+      "entity": "观测站点",
+      "pendingStatuses": ["待入网"],
+      "abnormalStatuses": ["降级运行"]
+    },
+    {
+      "key": "sensor",
+      "label": "观测传感器",
+      "entity": "观测传感器",
+      "pendingStatuses": ["待检定"],
+      "abnormalStatuses": ["疑误待查"]
+    },
+    {
+      "key": "observation",
+      "label": "观测记录",
+      "entity": "观测记录",
+      "pendingStatuses": ["待质控"],
+      "abnormalStatuses": ["疑误标记"]
+    },
+    {
+      "key": "quality",
+      "label": "数据质控",
+      "entity": "质控任务",
+      "pendingStatuses": ["待执行", "执行中"],
+      "abnormalStatuses": ["已退回"]
+    },
+    {
+      "key": "calibration",
+      "label": "设备标定",
+      "entity": "标定记录",
+      "pendingStatuses": ["待送检", "标定中"],
+      "abnormalStatuses": ["标定不合格"]
+    },
+    {
+      "key": "transmission",
+      "label": "数据传输",
+      "entity": "传输链路",
+      "pendingStatuses": ["待开通"],
+      "abnormalStatuses": ["缺报告警"]
+    },
+    {
+      "key": "power",
+      "label": "供电保障",
+      "entity": "供电单元",
+      "pendingStatuses": ["待巡检"],
+      "abnormalStatuses": ["备电不足", "已断电"]
+    },
+    {
+      "key": "layout",
+      "label": "站网布局",
+      "entity": "站网规划",
+      "pendingStatuses": ["待编制", "待审批"],
+      "abnormalStatuses": []
+    },
+    {
+      "key": "inspection",
+      "label": "巡检任务",
+      "entity": "巡检单",
+      "pendingStatuses": ["待派发", "巡检中"],
+      "abnormalStatuses": []
+    },
+    {
+      "key": "fault",
+      "label": "故障处置",
+      "entity": "故障记录",
+      "pendingStatuses": ["待派单", "处置中"],
+      "abnormalStatuses": ["已挂起"]
+    },
+    {
+      "key": "sparepart",
+      "label": "备件器材",
+      "entity": "备件器材",
+      "pendingStatuses": ["储备不足"],
+      "abnormalStatuses": ["已冻结"]
+    },
+    {
+      "key": "metainfo",
+      "label": "元数据登记",
+      "entity": "元数据记录",
+      "pendingStatuses": ["待登记", "待补充"],
+      "abnormalStatuses": []
+    },
+    {
+      "key": "alarm",
+      "label": "告警监测",
+      "entity": "告警记录",
+      "pendingStatuses": ["待确认", "处置中"],
+      "abnormalStatuses": []
+    },
+    {
+      "key": "comm",
+      "label": "通信设备",
+      "entity": "通信设备",
+      "pendingStatuses": ["待检修", "检修中"],
+      "abnormalStatuses": []
+    },
+    {
+      "key": "service",
+      "label": "服务保障",
+      "entity": "服务事项",
+      "pendingStatuses": ["待受理", "办理中"],
+      "abnormalStatuses": ["已退回"]
+    },
+    {
+      "key": "contract",
+      "label": "运维合同",
+      "entity": "运维合同",
+      "pendingStatuses": ["待签订", "已到期"],
+      "abnormalStatuses": ["已终止"]
+    },
+    {
+      "key": "settlement",
+      "label": "经费结算",
+      "entity": "结算单",
+      "pendingStatuses": ["待核算", "待审核"],
+      "abnormalStatuses": ["已驳回"]
+    },
+    {
+      "key": "training",
+      "label": "人员培训",
+      "entity": "培训记录",
+      "pendingStatuses": ["待开班", "进行中"],
+      "abnormalStatuses": []
+    }
+  ]
+}

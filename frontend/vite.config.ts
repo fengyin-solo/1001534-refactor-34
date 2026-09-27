@@ -19,6 +19,10 @@ export default defineConfig({
     // 关掉自动打开页面：起服务时只打印地址，不拉起浏览器
     open: false,
     strictPort: false,
+    // 允许 dev server 读取仓库根目录的 modules.config.json（模块清单唯一来源）
+    fs: {
+      allow: [fileURLToPath(new URL('..', import.meta.url))],
+    },
     proxy: {
       '/api': {
         target: proxyTarget,

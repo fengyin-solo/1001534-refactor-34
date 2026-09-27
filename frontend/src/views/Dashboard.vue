@@ -5,7 +5,15 @@
         <h2>运营概览</h2>
         <p class="page-desc">汇总各业务模块的关键指标，先看总量再看异常。</p>
       </div>
+      <div class="page-actions">
+        <button class="btn" type="button" :disabled="loading" @click="load">
+          {{ loading ? '刷新中…' : '刷新概览' }}
+        </button>
+      </div>
     </header>
+
+    <p v-if="errorMessage" class="error-text">{{ errorMessage }}</p>
+
     <div class="stat-row">
       <article v-for="card in cards" :key="card.label" class="stat-card">
         <span class="stat-label">{{ card.label }}</span>
@@ -17,7 +25,7 @@
         <tr><th>业务模块</th><th>今日新增</th><th>待处理</th><th>异常量</th></tr>
       </thead>
       <tbody>
-        <tr v-for="row in moduleRows" :key="row.name">
+        <tr v-for="row in moduleRows" :key="row.key">
           <td>{{ row.name }}</td>
           <td>{{ row.created }}</td>
           <td>{{ row.pending }}</td>
@@ -29,26 +37,64 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 
 import { fetchJson } from '@/api/client'
+import { MODULES } from '@/modules'
 
-type Overview = {
-  cards: { label: string; value: number }[]
-  modules: { name: string; created: number; pending: number; abnormal: number }[]
-}
+type ModuleRow = { key: string; name: string; created: number | string; pending: number | string; abnormal: number | string }
+type Overview = { modules: Array<{ key?: string; name: string; created: number; pending: number; abnormal: number }> }
 
-const cards = ref<Overview['cards']>([])
-const moduleRows = ref<Overview['modules']>([])
+const EMPTY = '—'
 
-onMounted(async () => {
+// 接口不可用时也按统一模块清单列出全部模块，数值用占位符，
+// 只提示真实原因，不回退到写死的假数据。
+const moduleRows = ref<ModuleRow[]>(
+  MODULES.map((module) => ({ key: module.key, name: module.label, created: EMPTY, pending: EMPTY, abnormal: EMPTY })),
+)
+const errorMessage = ref('')
+const loading = ref(false)
+
+// 卡片直接由模块汇总行推导，刷新后卡片与汇总表必然一致
+const cards = computed(() => {
+  const rows = moduleRows.value
+  const ready = rows.every((row) => typeof row.created === 'number')
+  const sum = (pick: (row: ModuleRow) => number | string) =>
+    ready ? rows.reduce((total, row) => total + Number(pick(row)), 0) : EMPTY
+  return [
+    { label: '业务模块', value: rows.length },
+    { label: '今日新增', value: sum((row) => row.created) },
+    { label: '待处理', value: sum((row) => row.pending) },
+    { label: '异常量', value: sum((row) => row.abnormal) },
+  ]
+})
+
+async function load() {
+  loading.value = true
+  errorMessage.value = ''
   try {
     const payload = await fetchJson<Overview>('/api/overview')
-    cards.value = payload.cards
-    moduleRows.value = payload.modules
-  } catch {
-    cards.value = [{"label": "业务模块", "value": 0}, {"label": "今日新增", "value": 0}]
-    moduleRows.value = [{"name": "观测站点", "created": 0, "pending": 0, "abnormal": 0}, {"name": "观测传感器", "created": 0, "pending": 0, "abnormal": 0}, {"name": "观测记录", "created": 0, "pending": 0, "abnormal": 0}, {"name": "数据质控", "created": 0, "pending": 0, "abnormal": 0}, {"name": "设备标定", "created": 0, "pending": 0, "abnormal": 0}, {"name": "数据传输", "created": 0, "pending": 0, "abnormal": 0}, {"name": "供电保障", "created": 0, "pending": 0, "abnormal": 0}, {"name": "站网布局", "created": 0, "pending": 0, "abnormal": 0}, {"name": "巡检任务", "created": 0, "pending": 0, "abnormal": 0}, {"name": "故障处置", "created": 0, "pending": 0, "abnormal": 0}, {"name": "备件器材", "created": 0, "pending": 0, "abnormal": 0}, {"name": "元数据登记", "created": 0, "pending": 0, "abnormal": 0}, {"name": "告警监测", "created": 0, "pending": 0, "abnormal": 0}, {"name": "通信设备", "created": 0, "pending": 0, "abnormal": 0}, {"name": "服务保障", "created": 0, "pending": 0, "abnormal": 0}, {"name": "运维合同", "created": 0, "pending": 0, "abnormal": 0}, {"name": "经费结算", "created": 0, "pending": 0, "abnormal": 0}, {"name": "人员培训", "created": 0, "pending": 0, "abnormal": 0}]
+    moduleRows.value = payload.modules.map((row, index) => ({
+      key: row.key ?? MODULES[index]?.key ?? `module-${index}`,
+      name: row.name,
+      created: row.created,
+      pending: row.pending,
+      abnormal: row.abnormal,
+    }))
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : '未知原因'
+    errorMessage.value = `运营概览接口暂不可用（${detail}）。请确认后端已启动（make backend 或 cd backend && ./run.sh）后点击「刷新概览」重试。`
+    moduleRows.value = MODULES.map((module) => ({
+      key: module.key,
+      name: module.label,
+      created: EMPTY,
+      pending: EMPTY,
+      abnormal: EMPTY,
+    }))
+  } finally {
+    loading.value = false
   }
-})
+}
+
+onMounted(load)
 </script>

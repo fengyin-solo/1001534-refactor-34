@@ -9,7 +9,6 @@ MODULE = "settlement"
 REQUIRED_FIELDS = ["结算单号", "关联合同", "结算周期"]
 STATUS_ORDER = ["待核算", "待审核", "已付款", "已驳回"]
 ACTION_RULES = {"提交审核": "待审核", "确认付款": "已付款", "驳回结算": "已驳回"}
-NEGATIVE_ACTIONS = ["驳回结算"]
 
 
 class SettlementService:
@@ -41,8 +40,6 @@ class SettlementService:
         entry = {"id": max((int(row.get("id", 0)) for row in rows), default=0) + 1}
         entry.update({field: values.get(field) for field in REQUIRED_FIELDS})
         entry["status"] = STATUS_ORDER[0]
-        entry["pending"] = True
-        entry["abnormal"] = False
         rows.append(entry)
         return entry, []
 
@@ -56,6 +53,4 @@ class SettlementService:
         if target not in STATUS_ORDER:
             return None, f"目标状态「{target}」不在允许的状态序列里"
         entry["status"] = target
-        entry["pending"] = target != STATUS_ORDER[-1]
-        entry["abnormal"] = action in NEGATIVE_ACTIONS
         return entry, f"结算单已{action}"

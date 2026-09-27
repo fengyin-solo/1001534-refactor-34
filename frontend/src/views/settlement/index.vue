@@ -63,9 +63,10 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 
 import { request } from '@/api/client'
+import { countByCriteria } from '@/modules'
 
 type Row = Record<string, string | number | null>
 
@@ -73,7 +74,16 @@ const ENDPOINT = '/api/settlement'
 const columns = ["结算单号", "关联合同", "结算周期", "应付金额", "已付金额", "审核人员", "付款日期", "结算状态"]
 const actions = ["提交审核", "确认付款", "驳回结算"]
 const statuses = ["待核算", "待审核", "已付款", "已驳回"]
-const stats = [{"label": "待审核结算", "value": 0}, {"label": "本月付款金额", "value": 0}, {"label": "已驳回单据", "value": 0}]
+const MODULE_KEY = 'settlement'
+// 统计卡片与运营概览同一份口径（modules.config.json），不再各自判断
+const stats = computed(() => {
+  const counts = countByCriteria(MODULE_KEY, rows.value)
+  return [
+    { label: '记录总量', value: counts.total },
+    { label: '待处理', value: counts.pending },
+    { label: '异常量', value: counts.abnormal },
+  ]
+})
 
 const rows = ref<Row[]>([])
 const total = ref(0)

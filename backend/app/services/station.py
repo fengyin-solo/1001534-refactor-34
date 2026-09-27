@@ -9,7 +9,6 @@ MODULE = "station"
 REQUIRED_FIELDS = ["站点编码", "站点名称", "站点类别"]
 STATUS_ORDER = ["待入网", "正常运行", "降级运行", "已停用"]
 ACTION_RULES = {"办理入网": "正常运行", "标记降级": "降级运行", "停用站点": "已停用"}
-NEGATIVE_ACTIONS = ["停用站点"]
 
 
 class StationService:
@@ -41,8 +40,6 @@ class StationService:
         entry = {"id": max((int(row.get("id", 0)) for row in rows), default=0) + 1}
         entry.update({field: values.get(field) for field in REQUIRED_FIELDS})
         entry["status"] = STATUS_ORDER[0]
-        entry["pending"] = True
-        entry["abnormal"] = False
         rows.append(entry)
         return entry, []
 
@@ -56,6 +53,4 @@ class StationService:
         if target not in STATUS_ORDER:
             return None, f"目标状态「{target}」不在允许的状态序列里"
         entry["status"] = target
-        entry["pending"] = target != STATUS_ORDER[-1]
-        entry["abnormal"] = action in NEGATIVE_ACTIONS
         return entry, f"观测站点已{action}"

@@ -9,7 +9,6 @@ MODULE = "layout"
 REQUIRED_FIELDS = ["规划编号", "规划区域", "目标站距"]
 STATUS_ORDER = ["待编制", "待审批", "已批复", "已作废"]
 ACTION_RULES = {"提交审批": "待审批", "确认批复": "已批复", "作废规划": "已作废"}
-NEGATIVE_ACTIONS = ["作废规划"]
 
 
 class LayoutService:
@@ -41,8 +40,6 @@ class LayoutService:
         entry = {"id": max((int(row.get("id", 0)) for row in rows), default=0) + 1}
         entry.update({field: values.get(field) for field in REQUIRED_FIELDS})
         entry["status"] = STATUS_ORDER[0]
-        entry["pending"] = True
-        entry["abnormal"] = False
         rows.append(entry)
         return entry, []
 
@@ -56,6 +53,4 @@ class LayoutService:
         if target not in STATUS_ORDER:
             return None, f"目标状态「{target}」不在允许的状态序列里"
         entry["status"] = target
-        entry["pending"] = target != STATUS_ORDER[-1]
-        entry["abnormal"] = action in NEGATIVE_ACTIONS
         return entry, f"站网规划已{action}"

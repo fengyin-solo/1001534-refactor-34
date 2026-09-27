@@ -9,7 +9,6 @@ MODULE = "calibration"
 REQUIRED_FIELDS = ["标定编号", "标定对象", "标定机构"]
 STATUS_ORDER = ["待送检", "标定中", "标定合格", "标定不合格"]
 ACTION_RULES = {"送检登记": "标定中", "确认合格": "标定合格", "判定不合格": "标定不合格"}
-NEGATIVE_ACTIONS = []
 
 
 class CalibrationService:
@@ -41,8 +40,6 @@ class CalibrationService:
         entry = {"id": max((int(row.get("id", 0)) for row in rows), default=0) + 1}
         entry.update({field: values.get(field) for field in REQUIRED_FIELDS})
         entry["status"] = STATUS_ORDER[0]
-        entry["pending"] = True
-        entry["abnormal"] = False
         rows.append(entry)
         return entry, []
 
@@ -56,6 +53,4 @@ class CalibrationService:
         if target not in STATUS_ORDER:
             return None, f"目标状态「{target}」不在允许的状态序列里"
         entry["status"] = target
-        entry["pending"] = target != STATUS_ORDER[-1]
-        entry["abnormal"] = action in NEGATIVE_ACTIONS
         return entry, f"标定记录已{action}"
